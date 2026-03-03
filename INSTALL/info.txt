@@ -1,0 +1,22 @@
+Pre-requirements:
+
+   1. Install Python
+   2. Install Julia
+   3. Install Conda
+
+Note: The Python, Julia, and Conda executables must be in the user path. If they are installed from
+      the official sites, this is done automatically. The latest versions are recommended.
+
+Installation:
+
+   1. Execute the installation script: source install_soss.sh
+
+The script will perform the following steps.
+
+   1. Create a Conda (Python) environment: julia-env
+   2. Install the necessary Python packages: numpy, ase, pymatgen
+   3. Install the necessary Julia packages: check Project.toml to see the list
+   4. Setup the Pyhton environment used by Julia
+   5. Test the installation
+
+After the installation, do not remove or modify this directory.

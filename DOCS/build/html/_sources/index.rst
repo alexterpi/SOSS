@@ -31,8 +31,6 @@ The `SOSS` package can be downloaded from its GitHub repository::
     git clone https://github.com/alexterpi/SOSS
 
 
-The package includes the source code, installation, testing, and usage scripts, as well as the manual and the manuscript.
-
 Contents
 --------
 
@@ -84,7 +82,7 @@ If you use `SOSS`, please cite `this paper <...>`_:
 Authors
 -------
 
-CrySF is being developed by:
+`SOSS` is being developed by:
 
 - Alex Teruel, BCAM - Basque Center for Applied Mathematics, Spain
 - Dr. Mauricio Rincon Bonilla, BCAM - Basque Center for Applied Mathematics, Spain
@@ -96,7 +94,7 @@ CrySF is being developed by:
 
 
 Contact
------------------------------------
+-------
 
 | If you have questions, please don't hesitate to reach out at: ateruel@bcamath.org
 | GitHub: `SOSS GitHub Repository <https://github.com/alexterpi/SOSS>`_

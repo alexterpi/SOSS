@@ -58,3 +58,13 @@ This package is distributed as part of a *Computer Physics Communications* (CPC)
 If you use `SOSS`, please cite this paper:
 
 -> add reference here <-
+
+## Authors and acknowledgment
+
+- Alex Teruel, BCAM - Basque Center for Applied Mathematics, Spain
+- Dr. Mauricio Rincon Bonilla, BCAM - Basque Center for Applied Mathematics, Spain
+- Dr. Henry Andres Cortes, BCAM - Basque Center for Applied Mathematics, Spain
+- Dr. Carlos León-Chinchay, University of Turku, Finland
+- Prof. Javier Carrasco, CIC energiGUNE, Spain
+- Prof. Roderick Melnik, Wilfrid Laurier University, Canada
+- Prof. Elena Akhmatskaya, BCAM - Basque Center for Applied Mathematics, Spain

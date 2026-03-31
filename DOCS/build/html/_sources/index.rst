@@ -7,8 +7,8 @@ Key Features:
 - Targeted applications: solid-state ionics (e.g. solid oxide fuel cells, solid-state batteries, supercapacitors, various energy storage devices, and sensors, etc.).
 - Type of solid structures: the position of the sites in the lattice remain constant; only some atoms are rearranged in the lattice sites (those that generate vacancies and/or impurities). 
 - Input/Output structure format: VASP format (POSCAR).
-- Optimization solvers: Simulate Annealing (trajectory-based) **, Discrete Global-based Harmony Search (population-based)?**
-- Objective function: Coulomb interaction energy with a cutoff radius **, Ewald summation?**
+- Optimization solvers: Simulate Annealing (trajectory-based).
+- Objective function: Coulomb interaction energy with a cutoff radius.
 - Overlap function (optional): an additional repulsion term in the interaction energy to avoid undesired overlaps between ions.
 - Ion-site constraint (optional): Classification of lattice sites based on their initial chemical element, enabling selective occupation rules for each ion type during optimization.
 
@@ -48,7 +48,7 @@ The User manual (`SOSSManual.pdf`) included in the package provides a general in
 
 Users are strongly encouraged to read the User manual before using `SOSS`.
 
-For a more in-depth description of the theoretical background and practical applications of the code, refer to `“Screening Energetically Stable Structures in Solid-State Ionics Applications” <...>`_ by Alex Teruel et al.
+For a more in-depth description of the theoretical background and practical applications of the code, refer to `“Screening Energetically Stable Structures in Solid-State Ionics Applications” <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6275668>`_ by Alex Teruel et al.
 
 Installation
 --------------------
@@ -77,18 +77,19 @@ License
 
 You are free to use, modify, and redistribute this software under the terms of the GPLv3. See the `LICENSE` file included with the package for the full license text.
 
-Reference
----------
+..
+  Reference
+  ---------
 
-This package is distributed as part of a *Computer Physics Communications* (CPC) *Computer Programs in Physics* (CPiP) publication.
+  This package is distributed as part of a *Computer Physics Communications* (CPC) *Computer Programs in Physics* (CPiP) publication.
 
-If you use `SOSS`, please cite `this paper <...>`_:
+  If you use `SOSS`, please cite `this paper <...>`_:
 
 
-::
+  ::
 
-    @article{...
-    }
+      @article{...
+      }
 
 Authors
 -------

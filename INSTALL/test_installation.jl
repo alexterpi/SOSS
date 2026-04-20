@@ -1,57 +1,90 @@
-# Import Julia packages
+# ==========================================================
+# Test Installation Script
+# ==========================================================
+using TOML
+using Pkg
+using Printf
+
+println("---------------------------------------------------------")
+println("🚀 Starting SOSS Full Installation Test")
+println("---------------------------------------------------------")
+
+# --- PART 1: Validate Julia Packages (Project.toml) ---
+println("📦 Step 1: Checking Julia dependencies...")
+
 try
-    using Conda
-    using PyCall
-    using UnPack
-    using Random
-    using StatsBase
-    using Statistics
-    using MutableNamedTuples
-    using PyPlot
-    using DelimitedFiles
-    using Test
-    println("Exit to import Julia packages")
+    # Parse the Project.toml file to identify required dependencies
+    project_data = TOML.parsefile(joinpath(pwd(), "Project.toml"))
+    julia_deps = collect(keys(project_data["deps"]))
+    
+    println("   Detected $(length(julia_deps)) Julia packages.")
+    
+    for pkg in julia_deps
+        # Dynamically evaluate 'using' for each package to verify availability
+        eval(Meta.parse("using $pkg"))
+        println("   ✅ Julia package: $pkg is ready.")
+    end
+    println("✨ All Julia packages loaded successfully.\n")
 catch e
-    println("Failed to import Julia packages:")
+    # Updated error message to focus on system requirements and prerequisites
+    println("\n❌ ERROR during installation:")
     println(e)
+    println("\nPlease verify that the system meets the installation requirements.")
+    exit(1)
 end
 
-# Check that Python environment is working
-importlib_metadata = pyimport("importlib.metadata")
+# --- PART 2: Validate Python Environment (CondaPkg.toml) ---
+println("🐍 Step 2: Checking Python environment...")
 
-try
-    numpy = pyimport("numpy")
-    println("Exit to import numpy / numpy version: ", importlib_metadata.version("numpy"))
-    global numpy_exit = 1
-catch e
-    println("Failed to import numpy: ", e)
-    global numpy_exit = 0
-end
+# Import interoperability tools already validated in the previous step
+using PythonCall
 
 try
-    ase = pyimport("ase")
-    println("Exit to import ase / ase version: ", importlib_metadata.version("ase"))
-    global ase_exit = 1
+    toml_path = joinpath(pwd(), "CondaPkg.toml")
+    if !isfile(toml_path)
+        println("❌ ERROR: 'CondaPkg.toml' not found.")
+        exit(1)
+    end
+
+    # Parse Python dependencies defined in CondaPkg.toml
+    config = TOML.parsefile(toml_path)
+    pkg_dict = config["deps"]
+    pkg_names = collect(keys(pkg_dict))
+
+    # Use importlib.metadata to query installed package versions in Python
+    importlib = pyimport("importlib.metadata")
+    
+    all_python_ok = true
+    println("-"^57)
+    @printf("%-20s | %-15s | %-10s\n", "Python Package", "Status", "Version")
+    println("-"^57)
+
+    for pkg_name in pkg_names
+        status = "❌ FAILED"
+        version = "N/A"
+        try
+            # Attempt to import and retrieve the version string
+            p = pyimport(pkg_name)
+            version = string(importlib.version(pkg_name))
+            status = "✅ OK"
+        catch
+            all_python_ok = false
+        end
+        @printf("%-20s | %-15s | %-10s\n", pkg_name, status, version)
+    end
+    println("-"^57)
+
+    if all_python_ok
+        println("\n✨ SUCCESS: SOSS is fully installed and functional!")
+    else
+        println("\n⚠️  WARNING: Some Python dependencies failed.")
+        println("Please verify that the system meets the installation requirements.")
+    end
+
 catch e
-    println("Failed to import ase: ", e)
-    global ase_exit = 0
+    println("\n❌ CRITICAL ERROR checking Python:")
+    println(e)
+    println("\nPlease verify that the system meets the installation requirements.")
 end
 
-try
-    pymatgen = pyimport("pymatgen")
-    println("Exit to import pymatgen / pymatgen version: ", importlib_metadata.version("pymatgen"))
-    global pymatgen_exit = 1
-catch e
-    println("Failed to import pymatgen: ", e)
-    global pymatgen_exit = 0
-end
-
-if numpy_exit + ase_exit + pymatgen_exit == 3
-    println("Python environment properly working")
-    println("SOSS was successfully installed\n")
-else
-    println("An error occurred during the installation process.")
-    println("Please review the error messages shown on the screen to verify that the issue is not related to your local installation or configuration of Python, Julia, and/or Conda.")
-    println("If you are unable to identify the problem (or if you determine that it is an issue with SOSS itself), you may contact one of the corresponding authors listed in the manuscript (SOSSManuscript.pdf) to verify the correct functioning of SOSS.\n")
-    println("Please do not contact the authors before confirming that the issue is not due to a user installation or configuration problem.")
-end
+println("---------------------------------------------------------")

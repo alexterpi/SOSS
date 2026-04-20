@@ -21,12 +21,25 @@ using Statistics
 using Random
 using UnPack
 using MutableNamedTuples
-using PyPlot
+using PythonCall
+using PythonPlot
+
+# using PyPlot
+
 using DelimitedFiles
 using Printf
 
+# Define references to Python modules/functions
+const plt = Ref{Py}(Py(nothing))
+
+# Initialize Python environment
+function __init__()
+    plt[] = pyimport("matplotlib.pyplot")
+end
+
 ####################################################################################################
 # functions devoted to writing/plotting data 
+
 
 function plot_E(
     RunDir::String
@@ -64,33 +77,35 @@ function plot_E(
     xmax = xval[end] + 1
     ymax = 1.0
     ymin = 0.0
-    PyPlot.ioff()
-    PyPlot.plot(xval, acceptance, ".k")
-    PyPlot.xlim(xmin, xmax)
-    PyPlot.ylim(ymin, ymax)
-    PyPlot.title("Evolution of Acceptance")
-    PyPlot.xlabel("Step")
-    PyPlot.ylabel("Acceptance")
-    PyPlot.savefig("$RunDir/acceptance_evol.pdf")
-    PyPlot.close()
+    plt[].ioff()
+    plt[].plot(xval, acceptance, ".k")
+    plt[].xlim(xmin, xmax)
+    plt[].ylim(ymin, ymax)
+    plt[].title("Evolution of Acceptance")
+    plt[].xlabel("Step")
+    plt[].ylabel("Acceptance")
+    plt[].tight_layout()
+    plt[].savefig("$RunDir/acceptance_evol.pdf")
+    plt[].close()
 
     # energy vs step
     xval = collect(1:length(lastE))
     xmin = 0.0
     xmax = xval[end] + 1
-    ymax = maximum([bestE; lastE; bestE]) + 0.02 * abs(maximum([bestE; lastE; bestE]))
-    ymin = minimum([bestE; lastE; bestE]) - 0.02 * abs(minimum([bestE; lastE; bestE]))
-    PyPlot.ioff()
-    PyPlot.plot(xval, lastE, ".k", label = "Last Solution")
-    PyPlot.plot(xval, bestE, "-k", label = "Best Solution")
-    PyPlot.xlim(xmin, xmax)
-    PyPlot.ylim(ymin, ymax)
-    PyPlot.title("Evolution of Energy")
-    PyPlot.xlabel("Step")
-    PyPlot.ylabel("Energy (eV/atom)", color="k")
-    PyPlot.legend(loc = "upper right", framealpha = 1, edgecolor = "k")
-    PyPlot.savefig("$RunDir/energy_evol.pdf")
-    PyPlot.close()
+    ymax = maximum([bestE; lastE]) #+ 0.01 * abs(maximum([bestE; lastE]))
+    ymin = minimum([bestE; lastE]) #- 0.01 * abs(minimum([bestE; lastE]))
+    plt[].ioff()
+    plt[].plot(xval, lastE, ".k", label = "Last Solution")
+    plt[].plot(xval, bestE, "-k", label = "Best Solution")
+    plt[].xlim(xmin, xmax)
+    plt[].ylim(ymin, ymax)
+    plt[].title("Evolution of Energy")
+    plt[].xlabel("Step")
+    plt[].ylabel("Energy (eV/atom)", color="k")
+    plt[].legend(loc = "upper right", framealpha = 1, edgecolor = "k")
+    plt[].tight_layout()
+    plt[].savefig("$RunDir/energy_evol.pdf")
+    plt[].close()
 
     # best solutions sampled with SOSS
     ΔE = sampled_bestE[end] - sampled_bestE[1]
@@ -99,16 +114,17 @@ function plot_E(
     xmax = xval[end] + 1
     ymax = maximum(sampled_bestE) + 0.01 * abs(maximum(sampled_bestE))
     ymin = minimum(sampled_bestE) - 0.01 * abs(minimum(sampled_bestE))
-    PyPlot.ioff()
-    PyPlot.plot(xval, sampled_bestE, ".k", label="ΔE = $ΔE eV/atom")
-    PyPlot.xlim(xmin, xmax)
-    PyPlot.ylim(ymin, ymax)
-    PyPlot.title("Energy of the best solutions sampled with SOSS")
-    PyPlot.xlabel("Solution")
-    PyPlot.ylabel("Energy (eV/atom)")
-    PyPlot.legend(loc="upper right")
-    PyPlot.savefig("$RunDir/best_solution.pdf")
-    PyPlot.close()
+    plt[].ioff()
+    plt[].plot(xval, sampled_bestE, ".k", label="ΔE = $ΔE eV/atom")
+    plt[].xlim(xmin, xmax)
+    plt[].ylim(ymin, ymax)
+    plt[].title("Energy of the best solutions sampled with SOSS")
+    plt[].xlabel("Solution")
+    plt[].ylabel("Energy (eV/atom)")
+    plt[].legend(loc="upper right")
+    plt[].tight_layout()
+    plt[].savefig("$RunDir/best_solution.pdf")
+    plt[].close()
 end
 
 function write_E(

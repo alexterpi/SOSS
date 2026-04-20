@@ -36,9 +36,9 @@ Iadd_sites   = [2]    # It is known that Ta ions can only occupy Zr sites -> sub
 # Ion-Site constraint
 IonSiteConstraint = true   # The constraint must be activated (subsets are needed).
 
-# Cutoff and overlap radius (Å)
-r_cutoff  = 7.0   # A cutoff radius of 7 Å proved to work well for this system.
-r_overlap = 1.7   # It is known (for this system) that distances below 1.7 Å are forbidden for ions.
+# Energy model
+LongRange  = [1, [7.0]] # Coulomb potential with a cutoff radius of 7.0 Å.
+ShortRange = [1, [1.7]] # Overlap potential with an overlap radius of 1.7 Å.
 
 # Summary of the optimization:
 # The input Atomic Structure File contains a 2x2x2 supercell of Li15 La3 Zr2 O12.
@@ -103,6 +103,8 @@ Charges of added ions.
 * Iadd_protons: vector of integers
 Atomic numbers of added ions.
 
+- CONSTRAINTS
+
 * Iadd_sites: vector of integers
 Subset of host ion sites (following the order defined in Ihost_symbols)
 available for added ions.
@@ -111,6 +113,8 @@ available for added ions.
 Boolean variable to control the ion-site constraint functionality.
 If true, the vector Iadd_sites is used.
 If false, the vector Iadd_sites is ignored.
+
+- ENERGY MODEL
 
 * r_cutoff: float
 Cutoff radius of the Coulomb interaction energy.

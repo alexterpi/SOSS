@@ -2,9 +2,8 @@ Pre-requirements:
 
    1. Install Python
    2. Install Julia
-   3. Install Conda
 
-Note: The Python, Julia, and Conda executables must be in the user path. If they are installed from
+Note: The Python and Julia executables must be in the user path. If they are installed from
       the official sites, this is done automatically. The latest versions are recommended.
 
 Installation:

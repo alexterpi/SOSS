@@ -1,0 +1,5 @@
+[deps]
+pymatgen = ""
+matplotlib = ""
+ase = ""
+numpy = ""

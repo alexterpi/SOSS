@@ -294,7 +294,7 @@ function plot2(
     ax2.tick_params(axis="y", colors="blue")
     plt[].errorbar(x_vals, y3mean, yerr=y3dev, color="b", label = "time")
     plt[].legend(loc = "upper right", framealpha = 1)
-    fig.savefig("OPTDIR/hsa_evolution.png")
+    fig.savefig("OPTFILES/hsa_evolution.png")
     plt[].close(fig)
 end
 
@@ -339,7 +339,7 @@ function writedata2(
     EnergyList::Vector{Float64}
     )
 
-    file = open("OPTDIR/OPTFILE.dat", "w")
+    file = open("OPTFILES/OPTFILE.dat", "w")
 
     # parameters
     write(file, "HSA\n")
@@ -586,15 +586,15 @@ function optimize_system(data::NamedTuple, params::NamedTuple)
     L = sum(Int64, LIons)
 
     # optimization main directory
-    if isdir("OPTDIR")
-        rm("OPTDIR", recursive=true)
+    if isdir("OPTFILES")
+        rm("OPTFILES", recursive=true)
     end
-    mkdir("OPTDIR")
+    mkdir("OPTFILES")
 
     # optimization files and subdirectories
     for i in 1:nruns
-        if !isdir("OPTDIR/RUN$i")
-            mkdir("OPTDIR/RUN$i")
+        if !isdir("OPTFILES/RUN$i")
+            mkdir("OPTFILES/RUN$i")
         end
     end
 
@@ -675,8 +675,8 @@ function optimize_system(data::NamedTuple, params::NamedTuple)
                 acceptance_mean          = compute_statistics(lastN, bestE_hist, worstE_hist, acceptance_hist)
 
                 # write/plot results
-                file = "OPTDIR/RUN$i/SUMMARY.dat"
-                fig  = "OPTDIR/RUN$i/HSM$Nmem.png"
+                file = "OPTFILES/RUN$i/SUMMARY.dat"
+                fig  = "OPTFILES/RUN$i/HSM$Nmem.png"
                 writedata1(file, Nmem, optimal.energy/Na, lastN,
                            bestE_mean/Na, bestE_std/Na,
                            worstE_mean/Na, worstE_std/Na,

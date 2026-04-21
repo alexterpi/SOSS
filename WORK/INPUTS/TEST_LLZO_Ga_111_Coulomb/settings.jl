@@ -35,7 +35,7 @@ Iadd_sites   = [0]
 IonSiteConstraint = false   # Irrelevant for this optimization.
 
 # Energy model
-LongRange  = [2, [0.0]] # Coulomb potential with a cutoff radius of 7.0 Å.
+LongRange  = [1, [7.0]] # Coulomb potential with a cutoff radius of 7.0 Å.
 ShortRange = [1, [1.7]] # Overlap potential with an overlap radius of 1.7 Å.
 
 # Summary of the optimization:

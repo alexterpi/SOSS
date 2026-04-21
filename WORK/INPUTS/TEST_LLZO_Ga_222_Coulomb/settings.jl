@@ -18,7 +18,7 @@ FU_symbols = ["Li", "La", "Zr", "O"]  # Names (chemical symbols).
 FU_numbers = [7.0, 3.0, 2.0, 12.0]    # Number of atoms and host ions per formula unit.
 FU_charges = [1.0, 3.0, 4.0, -2.0]    # Charges (in e units).
 FU_protons = [3, 57, 40, 8]           # Atomic numbers.
-FU_copies  = 8                        # Number of formula units in the supercell.
+FU_copies  = 64                       # Number of formula units in the supercell.
 
 # Host ions
 Ihost_symbols = ["Li"]    # Use Li sites to perform the optimization.
@@ -35,7 +35,7 @@ Iadd_sites   = [0]
 IonSiteConstraint = false   # Irrelevant for this optimization.
 
 # Energy model
-LongRange  = [2, [0.0]] # Coulomb potential with a cutoff radius of 7.0 Å.
+LongRange  = [1, [7.0]] # Coulomb potential with a cutoff radius of 7.0 Å.
 ShortRange = [1, [1.7]] # Overlap potential with an overlap radius of 1.7 Å.
 
 # Summary of the optimization:

@@ -1,6 +1,8 @@
 module HSA
 
-using PyPlot
+#using PyPlot
+using PythonCall
+using PythonPlot
 using StatsBase
 using Statistics
 using Random
@@ -9,6 +11,13 @@ using Test
 using UnPack
 using MutableNamedTuples
 
+# Define references to Python modules/functions
+const plt = Ref{Py}(Py(nothing))
+
+# Initialize Python environment
+function __init__()
+    plt[] = pyimport("matplotlib.pyplot")
+end
 
 function get_ilEnergy_ion_atoms(
     LIons::Vector{Int64},
@@ -234,15 +243,15 @@ function plot1(
     x1_ymax  = maximum(worstE_hist)
     x1_ymin  = minimum(bestE_hist) - 0.01*abs(minimum(bestE_hist))
 
-    PyPlot.close()
-    PyPlot.ioff()
-    fig, ax1 = PyPlot.subplots()
+    plt[].close()
+    plt[].ioff()
+    fig, ax1 = plt[].subplots()
     ax1.set_xlabel("ITERATION")
     ax1.set_ylabel("ENERGY (eV/ATOM)", color="k")
     ax1.set_ylim([x1_ymin, x1_ymax])
     ax1.plot(x, bestE_hist, "-r", label = "BEST E")
     ax1.plot(x, worstE_hist,"-.k", label = "WORST E")
-    PyPlot.legend(loc = "center left", framealpha = 1, edgecolor = "k")
+    plt[].legend(loc = "center left", framealpha = 1, edgecolor = "k")
     ax2 = ax1.twinx()
     ax2.set_ylabel("PROBABILITY", color="b")
     ax2.set_ylim([0.0, 1.0])
@@ -250,10 +259,10 @@ function plot1(
     ax2.plot(x, par_hist, "--b", linewidth=1.4, label = "PAR")
     ax2.plot(x, hcmr_hist, ":g", linewidth=1.4, label = "HCMR")
     #fig.legend(loc = "upper center")
-    PyPlot.legend(loc = "center right", framealpha = 1, edgecolor = "b")
-    PyPlot.title("HMS = $hms")
+    plt[].legend(loc = "center right", framealpha = 1, edgecolor = "b")
+    plt[].title("HMS = $hms")
     fig.savefig(namePlot1)
-    PyPlot.close(fig)
+    plt[].close(fig)
 end
 
 function plot2(
@@ -270,23 +279,23 @@ function plot2(
     ax1_ymax = maximum(y2mean) + maximum(y2dev) + 0.01*(maximum(y2mean) + maximum(y2dev))
     ax2_ymax = maximum(y3mean) + maximum(y3dev) + 0.01*(maximum(y3mean) + maximum(y3dev))
 
-    PyPlot.close()
-    PyPlot.ioff()
-    fig, ax1 = PyPlot.subplots()
+    plt[].close()
+    plt[].ioff()
+    fig, ax1 = plt[].subplots()
     ax1.set_xlabel("HMS")
     ax1.set_ylabel("mean energy (eV/ATOM)", color="k")
     ax1.set_ylim([ax1_ymin, ax1_ymax])
-    PyPlot.errorbar(x_vals, y2mean, yerr=y2dev, color="k", label = "worst E")
-    PyPlot.errorbar(x_vals, y1mean, yerr=y1dev, color="r", label = "best E")
-    PyPlot.legend(loc = "upper left", framealpha = 1)
+    plt[].errorbar(x_vals, y2mean, yerr=y2dev, color="k", label = "worst E")
+    plt[].errorbar(x_vals, y1mean, yerr=y1dev, color="r", label = "best E")
+    plt[].legend(loc = "upper left", framealpha = 1)
     ax2 = ax1.twinx()
     ax2.set_ylabel("time (seconds)", color="b")
     ax2.set_ylim([0.0, ax2_ymax])
     ax2.tick_params(axis="y", colors="blue")
-    PyPlot.errorbar(x_vals, y3mean, yerr=y3dev, color="b", label = "time")
-    PyPlot.legend(loc = "upper right", framealpha = 1)
+    plt[].errorbar(x_vals, y3mean, yerr=y3dev, color="b", label = "time")
+    plt[].legend(loc = "upper right", framealpha = 1)
     fig.savefig("OPTDIR/hsa_evolution.png")
-    PyPlot.close(fig)
+    plt[].close(fig)
 end
 
 function writedata1(
@@ -561,12 +570,18 @@ function loop_par!(
     end
 end
 
-function optimize_system(data::NamedTuple, params::String)
+function optimize_system(data::NamedTuple, params::NamedTuple)
 
     # solver parameters
-    include(params)
+    @unpack nruns = nruns, lastN, nIterations, hcmr, par, hms_0, hms_diff, hms_steps, display_mode = params
     # structure data
-    @unpack Ions, LIons, removedSites , Nv, Ne, Na, U, UionAionBlist, EnergyBase = data
+    @unpack Ions, LIons, optSites, NoptSites, Nv, Na, U, UionAionBlist, EnergyBase = data
+
+    # New terminology, update: removedSites -> optSites, Nv -> NoptSites, Ne -> Nv (and associated variables)
+    removedSites = optSites
+    Ne = Nv
+    Nv = NoptSites
+    #------------------------#
 
     L = sum(Int64, LIons)
 

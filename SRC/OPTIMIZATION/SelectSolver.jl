@@ -27,14 +27,16 @@ using MutableNamedTuples
 
 # load solvers
 include("SOLVERS/SANSS.jl")
+include("SOLVERS/HSA.jl")
 using .SANSS
+using .HSA
 
 function get_params(solver::String)
 
     # This function generates a params tuple for the selected solver.
     # The params tuple contains the parameters defined in the params.jl file.
     # Since different solvers use different parameters, for each new solver defined in the
-    # SOSS package, a new instance must be added below (currently, only SANSS is defined).
+    # SOSS package, a new instance must be added below (currently, SANSS and HSA are defined).
     # Arguments:
     # solver -----> String containing the name of the optimization solver.
     #
@@ -56,6 +58,18 @@ function get_params(solver::String)
             nRepeats = nRepeats::Int64,
             DisplayStyle = DisplayStyle::Int64,
             plots = plots::Bool
+        )
+    elseif solver == "HSA"
+        params = (
+            nruns = nruns::Int64,
+            lastN = lastN::Int64,
+            nIterations = nIterations::Int64,
+            hcmr = hcmr::Float64,
+            par = par::Float64,
+            hms_0 = hms_0::Int64,
+            hms_diff = hms_diff::Int64,
+            hms_steps = hms_steps::Int64,
+            display_mode = display_mode::Int64
         )
     end
     return params
@@ -83,6 +97,9 @@ function solve(data::NamedTuple, settings::NamedTuple)
     if solver == "SANSS"
         params = get_params(solver)
         solution = SANSS.SANSS_set(data, params)
+    elseif solver == "HSA"
+        params = get_params(solver)
+        solution = HSA.optimize_system(data, params)
     else
         println("ERROR: INCORRECT SOLVER")
     end

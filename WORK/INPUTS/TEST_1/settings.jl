@@ -32,7 +32,7 @@ Iadd_protons = []
 Iadd_sites   = []
 
 # Ion-Site constraint
-IonSiteConstraint = false   # Irrelevant for this optimization.
+IonSiteConstraint = false   # Ion-Site constraint is not used.
 
 # Energy model
 LongRange  = [1, [7.0]] # Coulomb potential with a cutoff radius of 7.0 Å.
@@ -62,20 +62,18 @@ Format of the output atomic structure file.
 
 - SYSTEM
 
-Note: When we refer to "atoms and host ions in the initial structure",
-      we are referring to all the chemical species that are in it.
-
 * FU_symbols: vector of strings
-Names (chemical symbols) of atoms and host ions in the initial structure.
+Names (chemical symbols) of anchored and host ions in the initial structure (chemical species in
+the initial structure).
 
 * FU_numbers: vector of floats
-Number of atoms and host ions (per formula unit) in the initial structure.
+Number of anchored and host ions (per formula unit) in the initial structure.
 
 * FU_charges: vector of floats
-Charges of atoms and host ions in the initial structure.
+Charges of anchored and host ions in the initial structure.
 
 * FU_protons: vector of integers
-Atomic numbers of atoms and host ions in the initial structure.
+Atomic numbers of anchored and host ions in the initial structure.
 
 * FU_copies: integer
 Number of formula units contained in the supercell.
@@ -103,8 +101,7 @@ Atomic numbers of added ions.
 - CONSTRAINTS
 
 * Iadd_sites: vector of integers
-Subset of host ion sites (following the order defined in Ihost_symbols)
-available for added ions.
+Subset of host ion sites (following the order defined in Ihost_symbols) available for added ions.
 
 * IonSiteConstraint: bool
 Boolean variable to control the ion-site constraint functionality.
@@ -113,13 +110,15 @@ If false, the vector Iadd_sites is ignored.
 
 - ENERGY MODEL
 
-* r_cutoff: float
-Cutoff radius of the Coulomb interaction energy.
-If it is positive, the code assumes that the entered value is the cutoff in Å.
-If it is negative, the code assumes that the entered value is a fraction of the max cutoff.
-The max cutoff is defined as half the length of the shortest side of the unit cell.
+* LongRange  = [LR_type, LR_params], LR_type: integer, LR_params: vector of floats
+Vector that controls the long-range interactions model.
+Options:
+(1) Truncated Coulomb with a cutoff radius r_cutoff (Å)-> LR_type = 1, LR_params = [r_cutoff]
+(2) Ewald summation -> LR_type = 2, LR_params = []
 
-* r_overlap: float
-Overlap radius in Å.
-Configurations with ion-ion or ion-atom distances below r_overlap are rejected.
+* ShortRange  = [SR_type, SR_params], SR_type: integer, SR_params: vector of floats
+Vector that controls the short-range interactions model.
+Oprions:
+(1) No interaction -> SR_type = 0, SR_params = []
+(2) Overlap repulsion with an overlap radius r_overlap (Å) -> SR_type = 0, SR_params = [r_overlap]
 ===================================================================================================#

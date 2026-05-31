@@ -16,7 +16,7 @@ tempLength::Int64 = 10_000
 
 # Secondary Cooling Scheme
 beta::Float64 = 0.1
-scheme::String = "linear"
+scheme::String = "arithmetic"
 
 # Exploration Criterion
 gamma::Int64 = 100
@@ -120,8 +120,9 @@ plots::Bool = true
 |..................................................|
 | scheme                                           |
 | def: Secondary Cooling Scheme.                   |
-| possible values: constant (OSCS1), linear (OSCS2)|
-| recommended: linear                              |
+| possible values: constant (OSCS1),               |
+|                  arithmetic (OSCS2)              |
+| recommended: arithmetic                          |
 |..................................................|
 | gamma                                            |
 | def: Maximum number of explored solutions before |

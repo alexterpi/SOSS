@@ -41,7 +41,7 @@ end
 # functions devoted to writing/plotting data 
 
 
-function plot_E(
+function plot_data(
     RunDir::String
     )
 
@@ -127,7 +127,7 @@ function plot_E(
     plt[].close()
 end
 
-function write_E(
+function write_data(
     sampled_bestE::Vector{Float64},
     lastE::Vector{Float64},
     bestE::Vector{Float64},
@@ -175,7 +175,7 @@ function write_E(
     close(file)
 end
 
-function write_opt(
+function write_summary(
     nRepeats::Int64,
     tempLength::Int64,
     scheme::String,
@@ -736,7 +736,7 @@ end
 ####################################################################################################
 # Functions devoted to initializing temperature
 
-function RandomWalk(
+function TempRandomWalk(
     L::Int64,
     MoveStyle::Array{Int,1},
     Nnbrs::Array{Int,1},
@@ -902,7 +902,7 @@ function InitialTemperature(
 
         # random walk
         steps = round(Int64, IT_params[1])
-        mean_ΔE, max_ΔE, min_ΔE = RandomWalk(L, MoveStyle, Nnbrs, optSites, IonsSubset, U,
+        mean_ΔE, max_ΔE, min_ΔE = TempRandomWalk(L, MoveStyle, Nnbrs, optSites, IonsSubset, U,
                                              UionAionBlist, EnergyBase, steps, config, nbrs, rng_rw)
         if IT_scheme == 2 # OIT2
             Tmax = IT_params[2] * max_ΔE
@@ -941,7 +941,7 @@ function getListT!(T0::Float64,
     # The currently available schemes are:
     #   scheme = "constant" -> No cooling, the reference temperature is used at each step of the
     #                          secondary cooling
-    #   scheme = "linear" ---> Linear cooling, the temperature decreases linearly from T0 to
+    #   scheme = "arithmetic" ---> arithmetic cooling, the temperature decreases arithmeticly from T0 to
     #                          T0 x beta.
     #
     # Arguments:
@@ -958,7 +958,7 @@ function getListT!(T0::Float64,
         for i in 1:tempLength
             listT[i] = T0
         end
-    elseif scheme == "linear"
+    elseif scheme == "arithmetic"
         Tf = T0 * beta
         dT = (Tf - T0) / tempLength
         for i in 1:tempLength
@@ -1506,7 +1506,7 @@ function SANSS_opt(
     end
 
     # generate optimization files
-    write_E(sampled_bestE/Na, lastE/Na, bestE/Na, acceptance, RunDir)
+    write_data(sampled_bestE/Na, lastE/Na, bestE/Na, acceptance, RunDir)
 
     # return optimal configuration and its energy
     return config, E[moves]
@@ -1660,12 +1660,12 @@ function SANSS_set(data::NamedTuple, params::NamedTuple)
     if plots && steps > 0
         for run in 1:nRepeats
             RunDir = "$OptDIR/RUN_$run"
-            plot_E(RunDir)
+            plot_data(RunDir)
         end
     end
 
     # write optimization summary
-    write_opt(
+    write_summary(
         nRepeats, tempLength, scheme, IT_scheme, IT_params, steps, beta,
         gamma, FirstToImprove, ScanningStyle, MaxStagnation, accepted,
         EnergyList[nonzero]/Na, RunList[nonzero], runtime, OptDIR, DisplayStyle, plots

@@ -42,7 +42,7 @@ function get_PrecomputedEnergy(
     )
 
     if LR_type == 1
-        E_AA, E_IA, E_II = get_PrecomputedEnergy_Coulomb(structure,
+        E_AA, E_IA, E_II = LR_TruncatedCoulomb(structure,
                                                          charges,
                                                          optSites,
                                                          NoptSites,
@@ -53,7 +53,7 @@ function get_PrecomputedEnergy(
                                                          SR_type,
                                                          SR_params)
     elseif LR_type == 2
-        E_AA, E_IA, E_II = get_PrecomputedEnergy_Ewald(structure,
+        E_AA, E_IA, E_II = LR_EwaldSum(structure,
                                                        Ns,
                                                        charges,
                                                        optSites,
@@ -73,7 +73,7 @@ end
 
 # define long-range interaction functions
 
-function get_PrecomputedEnergy_Coulomb(
+function LR_TruncatedCoulomb(
     structure,
     charges::Array{Float64, 1},
     optSites::Array{Int, 1},
@@ -93,15 +93,20 @@ function get_PrecomputedEnergy_Coulomb(
     # Change to Pymatgen structure object (we use Pymatgen to compute energies)
     structure = pymatgen_ase[].AseAtomsAdaptor().get_structure(structure)
 
-    # check cutoff radius
-    r_cutoff = get_cutoff(structure, r_cutoff)
+    # get max cutoff r_max (half the length of the shorter side of the box)
+    r_max = 0.5 * minimum(pyconvert(Vector{Float64}, structure.lattice.abc))
+    if r_cutoff < 0 # if negative, assume r_cutoff is a fraction of r_max
+        r_cutoff = abs(r_cutoff) * r_max
+    end
+    if r_cutoff > r_max # if positive (r_cutoff in Å), show a warning when r_cutoff > r_max
+        println("WARNING: CUTOFF LARGER THAN THE EXPECTED MAXIMUM CUTOFF (RMAX = $r_max Å)")
+    end
 
     # get neighbors and distances
-    distSite2Col, neighbors_of = getDistNeighbors(structure, r_cutoff)
+    distSite2Col, neighbors_of = get_neighbors(structure, r_cutoff)
     println("NEIGHBORS DEFINED")
 
     # precompute components of the interaction energy
-
     # E_AA: anchored-anchored ion pairs energy
     E_AA = 0
     for site in eachindex(charges)
@@ -115,7 +120,7 @@ function get_PrecomputedEnergy_Coulomb(
                     E_AA += C * QA * QB / distance
                     # short-range term (optional)
                     if SR_type == 1 # overlap function
-                        E_AA += overlap(distance, 1, 1, SR_params[1])
+                        E_AA += SR_Overlap(distance, 1, 1, SR_params[1])
                     end
                 end
             end
@@ -136,7 +141,7 @@ function get_PrecomputedEnergy_Coulomb(
                     E_IA[i, j] += C * QIons[j] * Q_B / distance
                     # short-range term (optional)
                     if SR_type == 1 # overlap function
-                        E_IA[i, j] += overlap(distance, TIons[j], 1, SR_params[1])
+                        E_IA[i, j] += SR_Overlap(distance, TIons[j], 1, SR_params[1])
                     end
                 end
             end
@@ -166,7 +171,7 @@ function get_PrecomputedEnergy_Coulomb(
                         e = C * QIons[i] * QIons[j] / dist_A_To_col[colB]
                         # short-range term (optional)
                         if SR_type == 1 # overlap function
-                            e += overlap(dist_A_To_col[colB], TIons[i], TIons[j], SR_params[1])
+                            e += SR_Overlap(dist_A_To_col[colB], TIons[i], TIons[j], SR_params[1])
                         end
                         pairInteracDic[A, B, colB, Ions[i], Ions[j]] = e
                     end
@@ -195,7 +200,7 @@ function get_PrecomputedEnergy_Coulomb(
 
 end
 
-function get_PrecomputedEnergy_Ewald(    
+function LR_EwaldSum(    
     structure,
     Ns::Int,
     charges::Array{Float64, 1},
@@ -223,15 +228,14 @@ function get_PrecomputedEnergy_Ewald(
         anchored_charges[site] = 0.0
     end
     
-    println("Computing Ewald Vij matrix...")
-
+    println("COMPUTING EWALD MATRIX")
     # for each site set charge to 1
     for i in 0:(Ns-1); structure[i].charge = 1.0; end
     # compute Ewald matrix prefactors
     ewald = pmg_ewald[].EwaldSummation(structure, acc_factor=12.0)
     V = pyconvert(Matrix{Float64}, ewald.total_energy_matrix) .* 2.0
-    
-    println("Computing E_AA...")
+    println("EWALD MATRIX COMPUTED")
+
     E_AA = 0.0
     for i in 1:Ns
         qi = anchored_charges[i]
@@ -244,14 +248,14 @@ function get_PrecomputedEnergy_Ewald(
             # short-range term (optional)
             if i ≠ j # no self interaction
                 if SR_type == 1 # overlap function
-                    E_AA += overlap(distances[i, j], 1, 1, SR_params[1])
+                    E_AA += SR_Overlap(distances[i, j], 1, 1, SR_params[1])
                 end
             end
         end
     end
     E_AA *= 0.5
+    println("ANCHORED-ANCHORED ION PAIRS INTERACTION ENERGY DEFINED")
 
-    println("Computing E_IA...")
     E_IA = zeros(Float64, NoptSites, NIons)
     for i_idx in 1:NoptSites # optimization sites
         i_glob = optSites[i_idx] 
@@ -266,15 +270,15 @@ function get_PrecomputedEnergy_Ewald(
                 inter_with_anch += qm * q_anch * V[i_glob, j_glob]
                 # short-range term (optional)
                 if SR_type == 1 # overlap function
-                    inter_with_anch += overlap(distances[i_glob, j_glob], tm, 1, SR_params[1])
+                    inter_with_anch += SR_Overlap(distances[i_glob, j_glob], tm, 1, SR_params[1])
                 end
             end
             # Ewald (self energy)
             E_IA[i_idx, m] = inter_with_anch + 0.5 * qm^2 * V[i_glob, i_glob]
         end
     end
-
-    println("Computing E_II...")        
+    println("INTERCHANGEABLE-ANCHORED ION PAIRS INTERACTION ENERGY DEFINED")
+      
     E_II = zeros(Float64, NoptSites, NoptSites, NIons, NIons)
     for i in 1:NoptSites # optimization sites
         i_glob = optSites[i]
@@ -291,20 +295,21 @@ function get_PrecomputedEnergy_Ewald(
                         E_II[i, j, m1, m2] = q1 * q2 * V[i_glob, j_glob]
                         # short-range term (optional)
                         if SR_type == 1 # overlap function
-                            E_II[i, j, m1, m2] += overlap(distances[i_glob, j_glob], t1, t2, SR_params[1])
+                            E_II[i, j, m1, m2] += SR_Overlap(distances[i_glob, j_glob], t1, t2, SR_params[1])
                         end
                     end
                 end
             end
         end
     end
+    println("INTERCHANGEABLE-INTERCHANGEABLE ION PAIRS INTERACTION ENERGY DEFINED")
     
     return E_AA, E_IA, E_II
 end
 
 # define short-range interaction functions
 
-function overlap(r12::Float64, type1::Int64, type2::Int64, r_overlap::Float64)
+function SR_Overlap(r12::Float64, type1::Int64, type2::Int64, r_overlap::Float64)
 
     # This function computes the overlap interaction energy between two ions.
     # The overlap energy is indeed a constraint added via interaction energy to avoid some 
@@ -342,59 +347,7 @@ end
 
 # define auxiliar functions
 
-function whereInt(elements::Array{Int,1}, elementToFind::Int)
-
-    # Function that returns the indexes and number of repetitions of a given integer inside a
-    # vector.
-    #
-    # Arguments:
-    # elements ------> Vector of integers.
-    # elementToFind -> Integer value we want to find inside the elements vector.
-    #
-    # Returns:
-    # listOfIndexes --------> Vector containing the positions where the integer value was
-    #                         found.
-    # numberOfCoincidences -> Number of times the element was found.
-
-    listOfIndexes        = findall(x->x==elementToFind, elements)
-    numberOfCoincidences = length(listOfIndexes)
-
-    return listOfIndexes, numberOfCoincidences
-end
-
-function get_cutoff(structure, r_cutoff)
-
-    # Function that gets the cutoff distance of the interaction energy (neighbors are only
-    # considered up to that distance).
-    #
-    # Arguments:
-    # structure -> Pymatgen structure object.
-    # r_cutoff ----> Cutoff distance .
-    #              If r_cutoff < 0 -> The function assumes that the entered value is a fraction of the
-    #                               max cutoff.
-    #              If r_cutoff > 0 -> The function assumes that the entered value is the cutoff in Å.
-    #
-    # Returns:
-    # r_cutoff -> Cutoff distance in Å.
-    #
-    # Note: If the entered cutoff is larger than the max cutoff, the value is accepted, but a
-    #       warning is printed by screen.
-    #       Since the code works with PBC, a cutoff value larger than the maximum cutoff value may
-    #       cause sites to interact not only with the closest image of their neighbors, but also
-    #       with the following images. 
-
-    r_max = 0.5 * minimum(pyconvert(Vector{Float64}, structure.lattice.abc))
-
-    if r_cutoff < 0
-        r_cutoff = abs(r_cutoff) * r_max
-    end
-    if r_cutoff > r_max
-        println("WARNING: CUTOFF LARGER THAN THE EXPECTED MAXIMUM CUTOFF (RMAX = $r_max Å)")
-    end
-    return r_cutoff
-end
-
-function getDistNeighbors(structure, r_cutoff::Float64)
+function get_neighbors(structure, r_cutoff::Float64)
 
     # Function that gets the neighbors of each site (inside the cutoff distance) and the distances.
     #
@@ -432,6 +385,26 @@ function getDistNeighbors(structure, r_cutoff::Float64)
         push!(distSite2Col, distances[cols])
     end
     return distSite2Col, neighbors_of
+end
+
+function whereInt(elements::Array{Int,1}, elementToFind::Int)
+
+    # Function that returns the indexes and number of repetitions of a given integer inside a
+    # vector.
+    #
+    # Arguments:
+    # elements ------> Vector of integers.
+    # elementToFind -> Integer value we want to find inside the elements vector.
+    #
+    # Returns:
+    # listOfIndexes --------> Vector containing the positions where the integer value was
+    #                         found.
+    # numberOfCoincidences -> Number of times the element was found.
+
+    listOfIndexes        = findall(x->x==elementToFind, elements)
+    numberOfCoincidences = length(listOfIndexes)
+
+    return listOfIndexes, numberOfCoincidences
 end
 
 end

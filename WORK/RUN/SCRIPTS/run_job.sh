@@ -36,10 +36,6 @@ mv RESULTS ../../OUTPUTS/$indir
 rm run_soss.jl
 rm -f instruct.vasp settings.jl params.jl seeds.dat
 
-# show success message
-#echo "\n$indir was executed successfully\n"
-#echo "-> The job took $(echo "scale=2; $dt/60" | bc) minutes, the results are in OUTPUTS/$indir"
-
 # Check if the program ran correctly (this does not mean that the optimization results are correct,
 # it simply means that the code did not fail during the optimization)
 if [ -d "../../OUTPUTS/$indir/STRUCTURES" ]; then

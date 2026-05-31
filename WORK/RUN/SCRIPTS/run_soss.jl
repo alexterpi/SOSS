@@ -16,8 +16,14 @@ Base.include(SelectSolver, "params.jl")
 # import settings
 settings = ImportSettings.get_settings()
 # import data
+t1 = time()
 data = ImportData.get_data(settings)
+t2 = time()
+println("Import data: $(t2 - t1) seconds")
 # solve the problem
+t3 = time()
 solution = SelectSolver.solve(data, settings)
+t4 = time()
+println("Optimization: $(t4 - t3) seconds")
 # export results
 ExportData.save_structure(data, solution, settings)

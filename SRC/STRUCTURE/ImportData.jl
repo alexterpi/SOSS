@@ -51,26 +51,6 @@ function read_structure(format::String)
     end
 end
 
-function whereInt(elements::Array{Int,1}, elementToFind::Int)
-
-    # Function that returns the indexes and number of repetitions of a given integer inside a
-    # vector.
-    #
-    # Arguments:
-    # elements ------> Vector of integers.
-    # elementToFind -> Integer value we want to find inside the elements vector.
-    #
-    # Returns:
-    # listOfIndexes --------> Vector containing the positions where the integer value was
-    #                         found.
-    # numberOfCoincidences -> Number of times the element was found.
-
-    listOfIndexes        = findall(x->x==elementToFind, elements)
-    numberOfCoincidences = length(listOfIndexes)
-
-    return listOfIndexes, numberOfCoincidences
-end
-
 function get_species(symbols)
 
     # Function that gets a vector containing the chemical symbols of the ions in the initial
@@ -203,7 +183,7 @@ function check_QConservation(FU_symbols, FU_numbers, FU_charges, Ihost_symbols,
 
 end
 
-function get_Sites(symbols::Vector{String}, Ihost_symbols::Vector{String})
+function get_OptSites(symbols::Vector{String}, Ihost_symbols::Vector{String})
 
     # Function that gets the optimization sites (sites used to place interchangeable ions and/or
     # vacancies during the optimization).
@@ -383,7 +363,7 @@ function get_data(settings::NamedTuple)
     # (3) Identify optimization sites and define interchangeable ion types
     # optimization sites, subset of the optimization sites, total number of optimization sites,
     # number of optimization sites of each subset
-    optSites, SitesSubset, NoptSites, NoptSites_i = get_Sites(symbols, Ihost_symbols)
+    optSites, SitesSubset, NoptSites, NoptSites_i = get_OptSites(symbols, Ihost_symbols)
 
     # (interchangeable) ion types: ion type ID, status (host ion / added ion),
     #                   available optimization sites subset, chemical symbol, number of ions,

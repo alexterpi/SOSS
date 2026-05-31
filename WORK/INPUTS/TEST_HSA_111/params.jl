@@ -3,14 +3,14 @@
 | 1. DO NOT MODDIFY THE VARIABLE TYPES           |
 | 2. FIND INFORMATION ABOUT THE PARAMETERS BELOW |
 =================================================#
-nruns::Int64        = 10 # 10
-lastN::Int64        = 20_000 # 20_000
-nIterations::Int64  = 100_000 # 100_000
+nruns::Int64        = 10
+lastN::Int64        = 20_000
+nIterations::Int64  = 100_000
 hcmr::Float64       = 0.9
 par::Float64        = 0.7
 hms_0::Int64        = 10
 hms_diff::Int64     = 5
-hms_steps::Int64    = 9 # 9
+hms_steps::Int64    = 9
 display_mode::Int64 = 1
 #================================================= 
 |------------------------------------------------|

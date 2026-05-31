@@ -6,11 +6,11 @@ using Pkg
 using Printf
 
 println("---------------------------------------------------------")
-println("🚀 Starting SOSS Full Installation Test")
+println("Starting SOSS Full Installation Test")
 println("---------------------------------------------------------")
 
 # --- PART 1: Validate Julia Packages (Project.toml) ---
-println("📦 Step 1: Checking Julia dependencies...")
+println("Step 1: Checking Julia dependencies...")
 
 try
     # Parse the Project.toml file to identify required dependencies
@@ -22,19 +22,19 @@ try
     for pkg in julia_deps
         # Dynamically evaluate 'using' for each package to verify availability
         eval(Meta.parse("using $pkg"))
-        println("   ✅ Julia package: $pkg is ready.")
+        println("   Julia package: $pkg is ready.")
     end
-    println("✨ All Julia packages loaded successfully.\n")
+    println("All Julia packages loaded successfully.\n")
 catch e
     # Updated error message to focus on system requirements and prerequisites
-    println("\n❌ ERROR during installation:")
+    println("\nERROR during installation:")
     println(e)
     println("\nPlease verify that the system meets the installation requirements.")
     exit(1)
 end
 
 # --- PART 2: Validate Python Environment (CondaPkg.toml) ---
-println("🐍 Step 2: Checking Python environment...")
+println("Step 2: Checking Python environment...")
 
 # Import interoperability tools already validated in the previous step
 using PythonCall
@@ -42,7 +42,7 @@ using PythonCall
 try
     toml_path = joinpath(pwd(), "CondaPkg.toml")
     if !isfile(toml_path)
-        println("❌ ERROR: 'CondaPkg.toml' not found.")
+        println("ERROR: 'CondaPkg.toml' not found.")
         exit(1)
     end
 
@@ -60,13 +60,13 @@ try
     println("-"^57)
 
     for pkg_name in pkg_names
-        status = "❌ FAILED"
+        status = "FAILED"
         version = "N/A"
         try
             # Attempt to import and retrieve the version string
             p = pyimport(pkg_name)
             version = string(importlib.version(pkg_name))
-            status = "✅ OK"
+            status = "OK"
         catch
             all_python_ok = false
         end
@@ -75,14 +75,14 @@ try
     println("-"^57)
 
     if all_python_ok
-        println("\n✨ SUCCESS: SOSS is fully installed and functional!")
+        println("\nSUCCESS: SOSS is fully installed and functional!")
     else
-        println("\n⚠️  WARNING: Some Python dependencies failed.")
+        println("\nWARNING: Some Python dependencies failed.")
         println("Please verify that the system meets the installation requirements.")
     end
 
 catch e
-    println("\n❌ CRITICAL ERROR checking Python:")
+    println("\nCRITICAL ERROR checking Python:")
     println(e)
     println("\nPlease verify that the system meets the installation requirements.")
 end

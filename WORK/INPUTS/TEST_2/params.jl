@@ -24,11 +24,11 @@ ScanningStyle::Int64 = 1
 FirstToImprove::Bool = true
 
 # Stopping Criterion
-steps::Int64 = 100
+steps::Int64 = 10
 MaxStagnation::Int64 = 0
 
 # Recurrence
-nRepeats::Int64 = 5
+nRepeats::Int64 = 1
 
 # Display
 DisplayStyle::Int64 = 2

@@ -8,7 +8,7 @@ Key Features:
 - Type of solid structures: the position of the sites in the lattice remain constant; only some atoms are rearranged in the lattice sites (those that generate vacancies and/or impurities). 
 - Input/Output structure format: VASP format (POSCAR).
 - Optimization solvers: Simulate Annealing (trajectory-based).
-- Objective function: Coulomb interaction energy with a cutoff radius.
+- Objective function: Coulomb interaction energy, computed through (1) a truncated Coulomb potential or (2) an Ewald summation.
 - Overlap function (optional): an additional repulsion term in the interaction energy to avoid undesired overlaps between ions.
 - Ion-site constraint (optional): Classification of lattice sites based on their initial chemical element, enabling selective occupation rules for each ion type during optimization.
 

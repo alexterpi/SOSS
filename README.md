@@ -1,3 +1,5 @@
+<img src="DOCS/Icon.png" width="30%">
+
 # SOSS
 
 `SOSS` (Search for Optimally Stable Structures) is an in-house optimization package developed at BCAM (Basque Center for Applied Mathematics) and written in Julia. It is designed to search for ground-state configurations of solid structures using heuristic optimization techniques. The core algorithm exploits the characteristic features of solid-state ionic structures and processes to reduce a high-dimensional optimization problem into a discrete model with precomputed components of the objective function, enabling efficient evaluations.
@@ -53,11 +55,11 @@ See the `LICENSE` file for the full license text.
 
 ## Reference
 
-This package is distributed as part of a *Computer Physics Communications* (CPC) *Computer Programs in Physics* (CPiP) publication.
+This package is distributed as part of a *Computer Physics Communications* (CPC) *Computer Programs in Physics* (CPiP) [publication](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6275668).
 
-If you use `SOSS`, please cite this paper:
+<!-- If you use `SOSS`, please cite this paper:
 
--> add reference here <-
+-> add reference here <- -->
 
 ## Authors and acknowledgment
 

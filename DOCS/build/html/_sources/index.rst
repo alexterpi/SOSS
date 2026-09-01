@@ -48,7 +48,8 @@ The User manual (`SOSSManual.pdf`) included in the package provides a general in
 
 Users are strongly encouraged to read the User manual before using `SOSS`.
 
-For a more in-depth description of the theoretical background and practical applications of the code, refer to `“Screening Energetically Stable Structures in Solid-State Ionics Applications” <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6275668>`_ by Alex Teruel et al.
+..
+  For a more in-depth description of the theoretical background and practical applications of the code, refer to `“Screening Energetically Stable Structures in Solid-State Ionics Applications” <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6275668>`_ by Alex Teruel et al.
 
 Installation
 --------------------

@@ -53,11 +53,12 @@ The general usage of `SOSS` (input files generation, code execution, and results
 You are free to use, modify, and redistribute this software under the terms of the GPLv3.
 See the `LICENSE` file for the full license text.
 
+<!--
 ## Reference
 
 This package is distributed as part of a *Computer Physics Communications* (CPC) *Computer Programs in Physics* (CPiP) [publication](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6275668).
 
-<!-- If you use `SOSS`, please cite this paper:
+If you use `SOSS`, please cite this paper:
 
 -> add reference here <- -->
 
